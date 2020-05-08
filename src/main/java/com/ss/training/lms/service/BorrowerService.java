@@ -21,6 +21,9 @@ import com.ss.training.lms.jdbc.ConnectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Trevor Huis in 't Veld
+ */
 @Component
 public class BorrowerService {
     
@@ -59,7 +62,26 @@ public class BorrowerService {
 		}
     }
 
-    public List<BookLoan> getLoansFromABorrower(Integer cardNo) throws SQLException {
+    public List<Borrower> getAllBorrowers() throws SQLException {
+        Connection conn = null;
+        try {
+            conn = connUtil.getConnection();
+            List<Borrower> borrowerList = borDAO.readAllBorrowers(conn);
+            if(borrowerList.size() == 0) {
+                return null;
+            }
+            return borrowerList;
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+			if(conn!=null){
+				conn.close();
+			}
+		}
+    }
+
+    public List<BookLoan> getLoansFromBorrower(Integer cardNo) throws SQLException {
         Connection conn = null;
         try {
             conn = connUtil.getConnection();
@@ -78,7 +100,7 @@ public class BorrowerService {
 		}
     }
 
-    public boolean returnABook(BookLoan loan) throws SQLException {
+    public boolean returnBook(BookLoan loan) throws SQLException {
         Connection conn = null;
         try {
             conn = connUtil.getConnection();
@@ -110,6 +132,7 @@ public class BorrowerService {
 		}
     }
 
+    // Not needed in API version but could be useful with UI
     public List<Book> getBookNamesFromLoans(List<BookLoan> loans) throws SQLException {
         Connection conn = null;
         try {
@@ -129,7 +152,7 @@ public class BorrowerService {
 		}
     }
 
-    public boolean checkOutABook(Integer bookId, Integer branchId, Integer cardNo) throws SQLException {
+    public boolean checkOutBook(Integer bookId, Integer branchId, Integer cardNo) throws SQLException {
         Connection conn = null;
         try {
             conn = connUtil.getConnection();
@@ -149,7 +172,7 @@ public class BorrowerService {
             conn.commit();
             return true;
         } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("You have already checked that book out.");
+            System.out.println("We are unable to process that book check out.");
             conn.rollback();
             return false;
         } finally {
