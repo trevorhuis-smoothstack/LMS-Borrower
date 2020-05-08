@@ -43,8 +43,8 @@ public class BorrowerDAO extends BaseDAO<Borrower> {
 			Borrower borrower = new Borrower();
 			borrower.setCardNo(rs.getInt("cardNo"));
 			borrower.setName(rs.getString("name"));
-			borrower.setAddress(rs.getString("name"));
-			borrower.setPhone(rs.getString("name"));
+			borrower.setAddress(rs.getString("address"));
+			borrower.setPhone(rs.getString("phone"));
 			borrowers.add(borrower);
 		}
 		return borrowers;
