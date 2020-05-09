@@ -43,65 +43,72 @@ public class BorrowerService {
     @Autowired
     BookDAO bookDAO;
 
-    public Borrower getBorrower(Integer cardNo) throws SQLException {
+    public Borrower readABorrower(Integer cardNo) throws SQLException {
         Connection conn = null;
+        boolean success = false;
         try {
             conn = connUtil.getConnection();
             List<Borrower> borrowerList = borDAO.readABorrower(cardNo, conn);
             if(borrowerList.size() == 0) {
                 return null;
             }
+            success = true;
             return borrowerList.get(0);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
         } finally {
-			if(conn!=null){
-				conn.close();
-			}
-		}
+            if(success)
+                conn.commit();
+            else
+                conn.rollback();
+            if(conn != null)
+                conn.close();
+        }
     }
 
-    public List<Borrower> getAllBorrowers() throws SQLException {
+    public List<Borrower> readAllBorrowers() throws SQLException, ClassNotFoundException {
         Connection conn = null;
+        boolean success = false;
         try {
             conn = connUtil.getConnection();
             List<Borrower> borrowerList = borDAO.readAllBorrowers(conn);
             if(borrowerList.size() == 0) {
                 return null;
             }
+            success = true;
             return borrowerList;
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-            return null;
         } finally {
-			if(conn!=null){
-				conn.close();
-			}
-		}
+            if(success)
+                conn.commit();
+            else
+                conn.rollback();
+            if(conn != null)
+                conn.close();
+        }
     }
 
-    public List<BookLoan> getLoansFromBorrower(Integer cardNo) throws SQLException {
+    public List<BookLoan> getLoansFromBorrower(Integer cardNo) throws SQLException, ClassNotFoundException {
         Connection conn = null;
+        boolean success = false;
         try {
             conn = connUtil.getConnection();
             List<BookLoan> loans = bookLoanDAO.readAllLoansFromABorrower(cardNo, conn);
             if(loans.size() == 0) {
                 return null;
             }
+            success = true;
             return loans;
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-            return null;
         } finally {
-			if(conn!=null){
-				conn.close();
-			}
-		}
+            if(success)
+                conn.commit();
+            else
+                conn.rollback();
+            if(conn != null)
+                conn.close();
+        }
     }
 
-    public boolean returnBook(BookLoan loan) throws SQLException {
+    public void returnBook(BookLoan loan) throws SQLException, ClassNotFoundException {
         Connection conn = null;
+        boolean success = false;
         try {
             conn = connUtil.getConnection();
 
@@ -119,41 +126,43 @@ public class BorrowerService {
             loan.setDateIn(now);
             
             bookLoanDAO.updateBookLoan(loan, conn);
-            conn.commit();
-            return true;
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-            conn.rollback();
-            return false;
+            success=true;
         } finally {
-			if(conn!=null){
-				conn.close();
-			}
-		}
+            if(success)
+                conn.commit();
+            else
+                conn.rollback();
+            if(conn != null)
+                conn.close();
+        }
     }
 
     // Not needed in API version but could be useful with UI
     public List<Book> getBookNamesFromLoans(List<BookLoan> loans) throws SQLException {
         Connection conn = null;
+        boolean success = false;
         try {
             conn = connUtil.getConnection();
             List<Book> books = new ArrayList<>();
             for(BookLoan loan: loans) {
                 books.add(bookDAO.readABookById(loan.getBookId(), conn).get(0));
             }
+            success=true;
             return books;
-        } catch ( SQLException e) {
-            e.printStackTrace();
-            return null;
         } finally {
-			if(conn!=null){
-				conn.close();
-			}
-		}
+            if(success)
+                conn.commit();
+            else
+                conn.rollback();
+            if(conn != null)
+                conn.close();
+        }
     }
 
-    public boolean checkOutBook(Integer bookId, Integer branchId, Integer cardNo) throws SQLException {
+    public void checkOutBook(Integer bookId, Integer branchId, Integer cardNo) throws SQLException,
+            ClassNotFoundException {
         Connection conn = null;
+        boolean success = false;
         try {
             conn = connUtil.getConnection();
 
@@ -169,16 +178,15 @@ public class BorrowerService {
             BookLoan loan = new BookLoan(bookId, branchId, cardNo, now, weekFromNowTS, null);
             
             bookLoanDAO.addBookLoan(loan, conn);
+            success=true;
             conn.commit();
-            return true;
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("We are unable to process that book check out.");
-            conn.rollback();
-            return false;
         } finally {
-			if(conn!=null){
-				conn.close();
-			}
-		}
+            if(success)
+                conn.commit();
+            else
+                conn.rollback();
+            if(conn != null)
+                conn.close();
+        }
     }
 }
