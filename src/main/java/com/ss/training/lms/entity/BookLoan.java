@@ -3,9 +3,6 @@ package com.ss.training.lms.entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class BookLoan implements Serializable{
     /**
      *
