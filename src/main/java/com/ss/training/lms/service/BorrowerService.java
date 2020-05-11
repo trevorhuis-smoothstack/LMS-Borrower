@@ -43,69 +43,76 @@ public class BorrowerService {
     @Autowired
     BookDAO bookDAO;
 
+    /**
+     * 
+     * @param cardNo
+     * @return
+     * @throws SQLException
+     */
     public Borrower readABorrower(Integer cardNo) throws SQLException {
         Connection conn = null;
-        boolean success = false;
         try {
             conn = connUtil.getConnection();
             List<Borrower> borrowerList = borDAO.readABorrower(cardNo, conn);
             if(borrowerList.size() == 0) {
                 return null;
             }
-            success = true;
             return borrowerList.get(0);
         } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
             if(conn != null)
                 conn.close();
         }
     }
 
+    /**
+     * 
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public List<Borrower> readAllBorrowers() throws SQLException, ClassNotFoundException {
         Connection conn = null;
-        boolean success = false;
         try {
             conn = connUtil.getConnection();
             List<Borrower> borrowerList = borDAO.readAllBorrowers(conn);
             if(borrowerList.size() == 0) {
                 return null;
             }
-            success = true;
             return borrowerList;
         } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
             if(conn != null)
                 conn.close();
         }
     }
 
+    /**
+     * 
+     * @param cardNo
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public List<BookLoan> getLoansFromBorrower(Integer cardNo) throws SQLException, ClassNotFoundException {
         Connection conn = null;
-        boolean success = false;
         try {
             conn = connUtil.getConnection();
             List<BookLoan> loans = bookLoanDAO.readAllLoansFromABorrower(cardNo, conn);
             if(loans.size() == 0) {
                 return null;
             }
-            success = true;
             return loans;
         } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
             if(conn != null)
                 conn.close();
         }
     }
 
+    /**
+     * 
+     * @param loan
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void returnBook(BookLoan loan) throws SQLException, ClassNotFoundException {
         Connection conn = null;
         boolean success = false;
@@ -138,28 +145,36 @@ public class BorrowerService {
     }
 
     // Not needed in API version but could be useful with UI
+    /**
+     * 
+     * @param loans
+     * @return
+     * @throws SQLException
+     */
     public List<Book> getBookNamesFromLoans(List<BookLoan> loans) throws SQLException {
         Connection conn = null;
-        boolean success = false;
         try {
             conn = connUtil.getConnection();
             List<Book> books = new ArrayList<>();
             for(BookLoan loan: loans) {
                 books.add(bookDAO.readABookById(loan.getBookId(), conn).get(0));
             }
-            success=true;
             return books;
         } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
             if(conn != null)
                 conn.close();
         }
     }
 
-    public void checkOutBook(Integer bookId, Integer branchId, Integer cardNo) throws SQLException,
+    /**
+     * 
+     * @param bookId
+     * @param branchId
+     * @param cardNo
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public BookLoan checkOutBook(Integer bookId, Integer branchId, Integer cardNo) throws SQLException,
             ClassNotFoundException {
         Connection conn = null;
         boolean success = false;
@@ -179,12 +194,35 @@ public class BorrowerService {
             
             bookLoanDAO.addBookLoan(loan, conn);
             success=true;
-            conn.commit();
+            return loan;
         } finally {
             if(success)
                 conn.commit();
             else
                 conn.rollback();
+            if(conn != null)
+                conn.close();
+        }
+    }
+
+    /**
+     * 
+     * @param branchId
+     * @param bookId
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
+    public boolean checkIfBranchHasACopy(int branchId, int bookId) throws ClassNotFoundException, SQLException {
+        Connection conn = null;
+        try {
+            conn = connUtil.getConnection();
+
+            // Add the book to the copies table
+            List<BookCopies> entries = entriesDAO.readAnEntry(branchId, bookId, conn);
+            if (entries.size() != 0 && entries.get(0).getNoOfCopies() > 0)
+                return true;
+            return false;
+        } finally {
             if(conn != null)
                 conn.close();
         }
