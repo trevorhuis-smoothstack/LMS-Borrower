@@ -1,5 +1,6 @@
 package com.ss.training.lms.dao;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.ss.training.lms.entity.BookLoan;
@@ -12,8 +13,5 @@ import org.springframework.stereotype.Repository;
 public interface BookLoanDAO extends JpaRepository<BookLoan, Long> {
 	List<BookLoan> findByCardNo(Integer cardNo);
 
-	@Override
-	default void deleteAll(Iterable<? extends BookLoan> arg0) {}
-
-	BookLoan findByBranchIdAndBookIdAndCardNo(Integer branchId, Integer bookId, Integer cardNo);
+	BookLoan findByBranchIdAndBookIdAndCardNoAndDateOut(Integer branchId, Integer bookId, Integer cardNo, Timestamp dateOut);
 }

@@ -15,7 +15,7 @@ public class Borrower implements Serializable{
     /**
      *
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3867602459442735000L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -46,11 +46,11 @@ public class Borrower implements Serializable{
         this.phone = phone;
 	}
 
-	public Integer getcardNo() {
+	public Integer getCardNo() {
         return cardNo;
     }
 
-    public void setcardNo(Integer cardNo) {
+    public void setCardNo(Integer cardNo) {
         this.cardNo = cardNo;
     }
 

@@ -11,7 +11,6 @@ import com.ss.training.lms.dao.BookLoanDAO;
 import com.ss.training.lms.dao.BorrowerDAO;
 import com.ss.training.lms.entity.BookCopies;
 import com.ss.training.lms.entity.BookLoan;
-import com.ss.training.lms.entity.Borrower;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -63,11 +62,11 @@ public class BorrowerService {
      */
     public boolean checkIfLoanExists(BookLoan loan) {
         BookLoan loanCheck;
-        loanCheck = bookLoanDAO.findByBranchIdAndBookIdAndCardNo(loan.getBranchId(), loan.getBookId(), loan.getCardNo());
+        loanCheck = bookLoanDAO.findByBranchIdAndBookIdAndCardNoAndDateOut(loan.getBranchId(), loan.getBookId(), loan.getCardNo(), loan.getDateOut());
 
-        if(loanCheck == null)
-            return false;
-        return true;
+        if(loanCheck != null && loan.getDateIn() == null)
+            return true;
+        return false;
     } 
 
     /**

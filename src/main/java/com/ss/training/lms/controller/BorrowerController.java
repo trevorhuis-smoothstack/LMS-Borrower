@@ -30,7 +30,7 @@ public class BorrowerController {
      */
 	@PutMapping(path="/returnBook")
 	public ResponseEntity<BookLoan> returnBook(@RequestBody BookLoan loan) {
-        if(loan.getBookId() == null || loan.getBranchId() == null || loan.getCardNo() == null)
+        if(loan.getBookId() == null || loan.getBranchId() == null || loan.getCardNo() == null || loan.getDateOut() == null)
             return new ResponseEntity<BookLoan>(loan, HttpStatus.BAD_REQUEST);
 
         boolean doesLoanExist = borrowerService.checkIfLoanExists(loan);
