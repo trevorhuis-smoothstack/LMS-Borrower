@@ -36,45 +36,6 @@ public class BorrowerService {
 
     /**
      * 
-     * @param cardNo
-     * @return
-     */
-    public Borrower readBorrower(Integer cardNo) {
-        List<Borrower> borrowerList = borDAO.findByCardNo(cardNo);
-        if(borrowerList.size() == 0) {
-            return null;
-        }
-        return borrowerList.get(0);
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public List<Borrower> readAllBorrowers(){
-        List<Borrower> borrowerList = borDAO.findAll();
-        if(borrowerList.size() == 0) {
-            return null;
-        }
-        return borrowerList;
-    }
-
-    /**
-     * 
-     * @param cardNo
-     * @return
-     */
-    public List<BookLoan> getLoansFromBorrower(Integer cardNo) {
-        List<BookLoan> loans = bookLoanDAO.findByCardNo(cardNo);
-        if(loans.size() == 0) {
-            return null;
-        }
-        return loans;
- 
-    }
-
-    /**
-     * 
      * @param loan
      */
     public void returnBook(BookLoan loan) {
@@ -94,6 +55,20 @@ public class BorrowerService {
         bookLoanDAO.save(loan);
             
     }
+
+    /**
+     * 
+     * @param loan
+     * @return
+     */
+    public boolean checkIfLoanExists(BookLoan loan) {
+        BookLoan loanCheck;
+        loanCheck = bookLoanDAO.findByBranchIdAndBookIdAndCardNo(loan.getBranchId(), loan.getBookId(), loan.getCardNo());
+
+        if(loanCheck == null)
+            return false;
+        return true;
+    } 
 
     /**
      * 
@@ -118,17 +93,20 @@ public class BorrowerService {
 
     /**
      * 
-     * @param loan
+     * @param bookId
+     * @param branchId
      * @return
      */
-    public boolean checkIfLoanExists(BookLoan loan) {
-        BookLoan loanCheck;
-        loanCheck = bookLoanDAO.findByBranchIdAndBookIdAndCardNo(loan.getBranchId(), loan.getBookId(), loan.getCardNo());
+    public boolean checkIfBookIsAvailable(Integer bookId, Integer branchId) {
+        BookCopies entry = entriesDAO.findByBranchIdAndBookId(branchId, bookId);
 
-        if(loanCheck == null)
-            return false;
-        return true;
-    } 
+        if(entry != null && entry.getNoOfCopies() > 0)
+            return true;
+        return false;
+    }
+
+
+
 }
 
     
