@@ -2,14 +2,33 @@ package com.ss.training.lms.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="tbl_borrower")
 public class Borrower implements Serializable{
     /**
      *
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3867602459442735000L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "cardNo")
     private Integer cardNo;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "address")
     private String address;
+
+    @Column(name = "phone")
     private String phone;
 
     public Borrower(Integer cardNo, String name, String address, String phone) {
@@ -19,8 +38,7 @@ public class Borrower implements Serializable{
         this.phone = phone;
     }
 
-    public Borrower() {
-	}
+    public Borrower() {}
 
 	public Borrower(String name, String address, String phone) {
         this.name = name;

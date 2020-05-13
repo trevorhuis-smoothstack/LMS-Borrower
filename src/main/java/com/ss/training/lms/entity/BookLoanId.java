@@ -1,40 +1,23 @@
 package com.ss.training.lms.entity;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-
-@Entity
-@Table(name="tbl_book_copies")
-@IdClass(BookCopiesId.class)
-public class BookCopies implements Serializable{
+/**
+ * @author Trevor Huis in 't Veld
+ */
+public class BookLoanId implements Serializable{
     /**
      *
      */
-    private static final long serialVersionUID = -5411320537300713589L;
-    @Id
-    @Column(name="bookId")
+    private static final long serialVersionUID = 2731226830537739427L;
     private Integer bookId;
-
-    @Id
-    @Column(name="branchId")
     private Integer branchId;
+    private Integer cardNo;
+    private Timestamp dateOut;
 
-    @Column(name="noOfCopies")
-    private Integer noOfCopies;
-
-    public BookCopies(Integer bookId, Integer branchId, Integer noOfCopies) {
-        this.bookId = bookId;
-        this.branchId = branchId;
-        this.noOfCopies = noOfCopies;
-    }
-
-    public BookCopies() {
-        
+    public static long getSerialversionuid() {
+        return serialVersionUID;
     }
 
     public Integer getBookId() {
@@ -53,12 +36,20 @@ public class BookCopies implements Serializable{
         this.branchId = branchId;
     }
 
-    public Integer getNoOfCopies() {
-        return noOfCopies;
+    public Integer getCardNo() {
+        return cardNo;
     }
 
-    public void setNoOfCopies(Integer noOfCopies) {
-        this.noOfCopies = noOfCopies;
+    public void setCardNo(Integer cardNo) {
+        this.cardNo = cardNo;
+    }
+
+    public Timestamp getDateOut() {
+        return dateOut;
+    }
+
+    public void setDateOut(Timestamp dateOut) {
+        this.dateOut = dateOut;
     }
 
     @Override
@@ -67,7 +58,8 @@ public class BookCopies implements Serializable{
         int result = 1;
         result = prime * result + ((bookId == null) ? 0 : bookId.hashCode());
         result = prime * result + ((branchId == null) ? 0 : branchId.hashCode());
-        result = prime * result + ((noOfCopies == null) ? 0 : noOfCopies.hashCode());
+        result = prime * result + ((cardNo == null) ? 0 : cardNo.hashCode());
+        result = prime * result + ((dateOut == null) ? 0 : dateOut.hashCode());
         return result;
     }
 
@@ -79,7 +71,7 @@ public class BookCopies implements Serializable{
             return false;
         if (getClass() != obj.getClass())
             return false;
-        BookCopies other = (BookCopies) obj;
+        BookLoanId other = (BookLoanId) obj;
         if (bookId == null) {
             if (other.bookId != null)
                 return false;
@@ -90,16 +82,18 @@ public class BookCopies implements Serializable{
                 return false;
         } else if (!branchId.equals(other.branchId))
             return false;
-        if (noOfCopies == null) {
-            if (other.noOfCopies != null)
+        if (cardNo == null) {
+            if (other.cardNo != null)
                 return false;
-        } else if (!noOfCopies.equals(other.noOfCopies))
+        } else if (!cardNo.equals(other.cardNo))
+            return false;
+        if (dateOut == null) {
+            if (other.dateOut != null)
+                return false;
+        } else if (!dateOut.equals(other.dateOut))
             return false;
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "BookCopies [bookId=" + bookId + ", branchId=" + branchId + ", noOfCopies=" + noOfCopies + "]";
-    }
+    
 }
