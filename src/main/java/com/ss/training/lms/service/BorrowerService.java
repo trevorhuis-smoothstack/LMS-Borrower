@@ -3,10 +3,8 @@ package com.ss.training.lms.service;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.ss.training.lms.dao.BookCopiesDAO;
-import com.ss.training.lms.dao.BookDAO;
 import com.ss.training.lms.dao.BookLoanDAO;
 import com.ss.training.lms.dao.BorrowerDAO;
 import com.ss.training.lms.entity.BookCopies;
@@ -29,9 +27,6 @@ public class BorrowerService {
     // This variable could be named better
     @Autowired
     BookCopiesDAO entriesDAO;
-
-    @Autowired
-    BookDAO bookDAO;
 
     /**
      * 
