@@ -1,22 +1,16 @@
 package com.ss.training.lms.service;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.ss.training.lms.dao.BookCopiesDAO;
 import com.ss.training.lms.dao.BookDAO;
 import com.ss.training.lms.dao.BookLoanDAO;
 import com.ss.training.lms.dao.BorrowerDAO;
-import com.ss.training.lms.entity.Book;
 import com.ss.training.lms.entity.BookCopies;
 import com.ss.training.lms.entity.BookLoan;
-import com.ss.training.lms.entity.Borrower;
-import com.ss.training.lms.jdbc.ConnectionUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,10 +20,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BorrowerService {
-    
-    @Autowired
-    ConnectionUtil connUtil;
-
     @Autowired
     BookLoanDAO bookLoanDAO;
 
@@ -43,150 +33,79 @@ public class BorrowerService {
     @Autowired
     BookDAO bookDAO;
 
-    public Borrower readABorrower(Integer cardNo) throws SQLException {
-        Connection conn = null;
-        boolean success = false;
-        try {
-            conn = connUtil.getConnection();
-            List<Borrower> borrowerList = borDAO.readABorrower(cardNo, conn);
-            if(borrowerList.size() == 0) {
-                return null;
-            }
-            success = true;
-            return borrowerList.get(0);
-        } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
-            if(conn != null)
-                conn.close();
-        }
-    }
+    /**
+     * 
+     * @param loan
+     */
+    public void returnBook(BookLoan loan) {
+        BookCopies entry;
+        entry = entriesDAO.findByBranchIdAndBookId(loan.getBranchId(), loan.getBookId());
 
-    public List<Borrower> readAllBorrowers() throws SQLException, ClassNotFoundException {
-        Connection conn = null;
-        boolean success = false;
-        try {
-            conn = connUtil.getConnection();
-            List<Borrower> borrowerList = borDAO.readAllBorrowers(conn);
-            if(borrowerList.size() == 0) {
-                return null;
-            }
-            success = true;
-            return borrowerList;
-        } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
-            if(conn != null)
-                conn.close();
-        }
-    }
+        if (entry == null) 
+            entry = new BookCopies(loan.getBookId(), loan.getBranchId(), 1);
+        else 
+            entry = new BookCopies(loan.getBookId(), loan.getBranchId(), (entry.getNoOfCopies() + 1));
+        
+        entriesDAO.save(entry);
 
-    public List<BookLoan> getLoansFromBorrower(Integer cardNo) throws SQLException, ClassNotFoundException {
-        Connection conn = null;
-        boolean success = false;
-        try {
-            conn = connUtil.getConnection();
-            List<BookLoan> loans = bookLoanDAO.readAllLoansFromABorrower(cardNo, conn);
-            if(loans.size() == 0) {
-                return null;
-            }
-            success = true;
-            return loans;
-        } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
-            if(conn != null)
-                conn.close();
-        }
-    }
-
-    public void returnBook(BookLoan loan) throws SQLException, ClassNotFoundException {
-        Connection conn = null;
-        boolean success = false;
-        try {
-            conn = connUtil.getConnection();
-
-            // Add the book to the copies table
-            List<BookCopies> entries = entriesDAO.readAnEntry(loan.getBranchId(), loan.getBookId(), conn);
-            if (entries.size() == 0) {
-                BookCopies entry = new BookCopies(loan.getBookId(), loan.getBranchId(), 1);
-                entriesDAO.addBookCopiesEntry(entry, conn);
-            } else if (entries.size() > 0){
-                BookCopies entry = new BookCopies(loan.getBookId(), loan.getBranchId(), (entries.get(0).getNoOfCopies() + 1));
-                entriesDAO.updateBookCopiesEntry(entry, conn);
-            }
-
-            Timestamp now = Timestamp.from(Instant.now());
-            loan.setDateIn(now);
+        Timestamp now = Timestamp.from(Instant.now());
+        loan.setDateIn(now);
+        
+        bookLoanDAO.save(loan);
             
-            bookLoanDAO.updateBookLoan(loan, conn);
-            success=true;
-        } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
-            if(conn != null)
-                conn.close();
-        }
     }
 
-    // Not needed in API version but could be useful with UI
-    public List<Book> getBookNamesFromLoans(List<BookLoan> loans) throws SQLException {
-        Connection conn = null;
-        boolean success = false;
-        try {
-            conn = connUtil.getConnection();
-            List<Book> books = new ArrayList<>();
-            for(BookLoan loan: loans) {
-                books.add(bookDAO.readABookById(loan.getBookId(), conn).get(0));
-            }
-            success=true;
-            return books;
-        } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
-            if(conn != null)
-                conn.close();
-        }
+    /**
+     * 
+     * @param loan
+     * @return
+     */
+    public boolean checkIfLoanExists(BookLoan loan) {
+        BookLoan loanCheck;
+        loanCheck = bookLoanDAO.findByBranchIdAndBookIdAndCardNoAndDateOut(loan.getBranchId(), loan.getBookId(), loan.getCardNo(), loan.getDateOut());
+
+        if(loanCheck != null && loan.getDateIn() == null)
+            return true;
+        return false;
+    } 
+
+    /**
+     * 
+     * @param bookId
+     * @param branchId
+     * @param cardNo
+     */
+    public void checkOutBook(Integer bookId, Integer branchId, Integer cardNo) {
+
+        BookCopies entry = entriesDAO.findByBranchIdAndBookId(branchId, bookId);
+        entry = new BookCopies(bookId, branchId, (entry.getNoOfCopies() - 1));
+        entriesDAO.save(entry);
+        
+        LocalDateTime weekFromNow = LocalDateTime.now().plusDays(7);
+        Timestamp weekFromNowTS = Timestamp.valueOf(weekFromNow);
+        Timestamp now = Timestamp.from(Instant.now());
+
+        BookLoan loan = new BookLoan(bookId, branchId, cardNo, now, weekFromNowTS, null);
+        
+        bookLoanDAO.save(loan);
     }
 
-    public void checkOutBook(Integer bookId, Integer branchId, Integer cardNo) throws SQLException,
-            ClassNotFoundException {
-        Connection conn = null;
-        boolean success = false;
-        try {
-            conn = connUtil.getConnection();
+    /**
+     * 
+     * @param bookId
+     * @param branchId
+     * @return
+     */
+    public boolean checkIfBookIsAvailable(Integer bookId, Integer branchId) {
+        BookCopies entry = entriesDAO.findByBranchIdAndBookId(branchId, bookId);
 
-            // Add the book to the copies table
-            List<BookCopies> entries = entriesDAO.readAnEntry(branchId, bookId, conn);
-            BookCopies entry = new BookCopies(bookId, branchId, (entries.get(0).getNoOfCopies() - 1));
-            entriesDAO.updateBookCopiesEntry(entry, conn);
-            
-            LocalDateTime weekFromNow = LocalDateTime.now().plusDays(7);
-            Timestamp weekFromNowTS = Timestamp.valueOf(weekFromNow);
-            Timestamp now = Timestamp.from(Instant.now());
-
-            BookLoan loan = new BookLoan(bookId, branchId, cardNo, now, weekFromNowTS, null);
-            
-            bookLoanDAO.addBookLoan(loan, conn);
-            success=true;
-            conn.commit();
-        } finally {
-            if(success)
-                conn.commit();
-            else
-                conn.rollback();
-            if(conn != null)
-                conn.close();
-        }
+        if(entry != null && entry.getNoOfCopies() > 0)
+            return true;
+        return false;
     }
+
+
+
 }
+
+    

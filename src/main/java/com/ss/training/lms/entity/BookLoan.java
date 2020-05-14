@@ -3,17 +3,43 @@ package com.ss.training.lms.entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="tbl_book_loans")
+@IdClass(BookLoanId.class)
 public class BookLoan implements Serializable{
     /**
      *
      */
     private static final long serialVersionUID = 417857204653787441L;
+
+    @Id
+    @Column(name="bookId")
     private Integer bookId;
+
+    @Id
+    @Column(name="branchId")
     private Integer branchId;
+
+    @Id
+    @Column(name="cardNo")
     private Integer cardNo;
+
+    @Id
+    @Column(name="dateOut")
     private Timestamp dateOut;
+
+    @Column(name="dueDate")
     private Timestamp dueDate;
+
+    @Column(name="dateIn")
     private Timestamp dateIn;
+
 
     public BookLoan(Integer bookId, Integer branchId, Integer cardNo, Timestamp dateOut, Timestamp dueDate, Timestamp dateIn) {
         this.bookId = bookId;
@@ -23,7 +49,7 @@ public class BookLoan implements Serializable{
         this.dueDate = dueDate;
         this.dateIn = dateIn;
     }
-
+    
     public BookLoan() {
 	}
 
