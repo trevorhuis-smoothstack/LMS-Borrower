@@ -49,12 +49,14 @@ public class BorrowerController {
      * @return
      */
 	@PostMapping(path="/checkOutBook/{bookId}/branch/{branchId}/borrower/{cardNo}")
-	public HttpStatus checkOutBook(@PathVariable int bookId, @PathVariable int branchId, @PathVariable int cardNo) {
+	public ResponseEntity<BookLoan> checkOutBook(@PathVariable int bookId, @PathVariable int branchId, @PathVariable int cardNo) {
+        BookLoan loan = null;
         boolean isBookAvailable = borrowerService.checkIfBookIsAvailable(bookId, branchId);
 
         if(!isBookAvailable)
-            return HttpStatus.NOT_FOUND;
-        borrowerService.checkOutBook(bookId, branchId, cardNo);
-        return HttpStatus.ACCEPTED;
+            return new ResponseEntity<BookLoan>(loan, HttpStatus.NOT_FOUND);
+        loan = borrowerService.checkOutBook(bookId, branchId, cardNo);
+        return new ResponseEntity<BookLoan>(loan, HttpStatus.OK);
 	}
 }
+
