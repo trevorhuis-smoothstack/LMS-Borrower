@@ -70,7 +70,7 @@ public class BorrowerService {
      * @param branchId
      * @param cardNo
      */
-    public void checkOutBook(Integer bookId, Integer branchId, Integer cardNo) {
+    public BookLoan checkOutBook(Integer bookId, Integer branchId, Integer cardNo) {
 
         BookCopies entry = entriesDAO.findByBranchIdAndBookId(branchId, bookId);
         entry = new BookCopies(bookId, branchId, (entry.getNoOfCopies() - 1));
@@ -83,6 +83,7 @@ public class BorrowerService {
         BookLoan loan = new BookLoan(bookId, branchId, cardNo, now, weekFromNowTS, null);
         
         bookLoanDAO.save(loan);
+        return loan;
     }
 
     /**
