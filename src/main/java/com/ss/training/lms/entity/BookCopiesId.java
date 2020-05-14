@@ -2,28 +2,19 @@ package com.ss.training.lms.entity;
 
 import java.io.Serializable;
 
-public class BookGenre implements Serializable{
+/**
+ * @author Trevor Huis in 't Veld
+ */
+public class BookCopiesId implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -2215002821278598222L;
-    private Integer genre_id;
+    private static final long serialVersionUID = 5504505313515789838L;
     private Integer bookId;
+    private Integer branchId;
 
-    public BookGenre(Integer genre_id, int bookId) {
-        this.genre_id = genre_id;
-        this.bookId = bookId;
-	}
-
-	public BookGenre() {
-	}
-
-	public Integer getGenre_id() {
-        return genre_id;
-    }
-
-    public void setGenre_id(Integer genre_id) {
-        this.genre_id = genre_id;
+    public static long getSerialversionuid() {
+        return serialVersionUID;
     }
 
     public Integer getBookId() {
@@ -34,12 +25,20 @@ public class BookGenre implements Serializable{
         this.bookId = bookId;
     }
 
+    public Integer getBranchId() {
+        return branchId;
+    }
+
+    public void setBranchId(Integer branchId) {
+        this.branchId = branchId;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((bookId == null) ? 0 : bookId.hashCode());
-        result = prime * result + ((genre_id == null) ? 0 : genre_id.hashCode());
+        result = prime * result + ((branchId == null) ? 0 : branchId.hashCode());
         return result;
     }
 
@@ -51,25 +50,18 @@ public class BookGenre implements Serializable{
             return false;
         if (getClass() != obj.getClass())
             return false;
-        BookGenre other = (BookGenre) obj;
+        BookCopiesId other = (BookCopiesId) obj;
         if (bookId == null) {
             if (other.bookId != null)
                 return false;
         } else if (!bookId.equals(other.bookId))
             return false;
-        if (genre_id == null) {
-            if (other.genre_id != null)
+        if (branchId == null) {
+            if (other.branchId != null)
                 return false;
-        } else if (!genre_id.equals(other.genre_id))
+        } else if (!branchId.equals(other.branchId))
             return false;
         return true;
     }
-
-    @Override
-    public String toString() {
-        return "BookGenre [bookId=" + bookId + ", genre_id=" + genre_id + "]";
-    }
-
-
-
+    
 }
