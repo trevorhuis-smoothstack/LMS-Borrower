@@ -59,7 +59,7 @@ public class BorrowerService {
         BookLoan loanCheck;
         loanCheck = bookLoanDAO.findByBranchIdAndBookIdAndCardNoAndDateOut(loan.getBranchId(), loan.getBookId(), loan.getCardNo(), loan.getDateOut());
 
-        if(loanCheck != null && loan.getDateIn() == null)
+        if(loanCheck != null && loanCheck.getDateIn() == null)
             return true;
         return false;
     } 
